@@ -60,5 +60,12 @@ namespace UnitTests
 			Assert::IsTrue(getopt((int)argv.size(), &argv[0], opts) == EOF, L"last option");
 			Assert::IsTrue(optind == 5, L"first param index");
 		}
+
+		TEST_METHOD(Test_cutInput)
+		{
+			Assert::IsTrue(cutInput(2, 0, std::string("abc")).compare("ab") == 0);
+
+			Assert::IsTrue(cutInput(2, '_', std::string("a_b_c")).compare("a_b") == 0);
+		}
 	};
 }

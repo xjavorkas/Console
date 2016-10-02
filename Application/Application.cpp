@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include <stdlib.h>
+#include <string>
 #include "..\Library\Library.h"
 #include <iostream>
 
@@ -22,7 +23,7 @@ void DisplayUsage(char * appPath)
 max - kolko znakov/segmentov chceme vypísať
 delim - ak != 0, tak potom delitel segmentov
 */
-void cut(unsigned int max, int delim);
+void cut(unsigned int max, int delim, char *path);
 
 int main(int argc, char **argv)
 {
@@ -30,13 +31,14 @@ int main(int argc, char **argv)
 	char *ptr;
 	int delim = 0;
 	int max = 0;
+	char *path = NULL;
 	if (argc == 1)
 	{
 		DisplayUsage(argv[0]);
 	}
 	else
 	{
-		while ((c = getopt(argc, argv, "hd:m:")) != EOF)
+		while ((c = getopt(argc, argv, "hd:m:f:")) != EOF)
 		{
 			switch (c)
 			{
@@ -46,6 +48,9 @@ int main(int argc, char **argv)
 			case 'd':
 				// prvý znak zo špecifikacie je oddelovať
 				delim = optarg[0];
+				break;
+			case 'f':
+				path = optarg;
 				break;
 			case 'm':
 				max = strtol(optarg, &ptr, 10);
@@ -63,20 +68,31 @@ int main(int argc, char **argv)
 	}
 
 
-	cut(max, delim);
-	std::cout << std::endl;
+	cut(max, delim, path);
 	return 0;
 }
 
-void cut(unsigned int max, int delim) {
+void cut(unsigned int max, int delim, char *path) {
 	// ak nešpecifikujeme max, vypíše prvý segment/znak
 	if (!max)
 		max = 1;
 	unsigned int charCounter = 0;
 	unsigned int segmentCounter = 0;
+	FILE *file = stdin;
+	if (path != NULL) {
+		file = fopen(path, "r");
+		if (file == NULL) {
+			std::cout << "nepodarilo sa otvorit subor" << std::endl;
+			return;
+		}
+	}
 	// read vstup, znak po znaku
-	for (int ch = 0; (ch = fgetc(stdin)) != EOF; ++charCounter)
+	for (int ch = 0; (ch = fgetc(file)) != EOF; ++charCounter)
 	{
+		if (ch == '\n')
+		{
+			charCounter = segmentCounter = 0;
+		}
 		if (ch == delim)
 		{
 			++segmentCounter;
@@ -89,7 +105,8 @@ void cut(unsigned int max, int delim) {
 		}
 
 		// možme breaknut, nečitame dalej
-		else
-			break;
+		// else
+		// break;
 	}
+	if (path != NULL) fclose(file);
 }

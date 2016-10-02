@@ -10,7 +10,11 @@
 #define LIBRARY_API __declspec(dllimport)
 #endif
 
+#include <string>
+#include <iostream>
+
 extern LIBRARY_API int optind;
 extern LIBRARY_API char *optarg;
 
 LIBRARY_API int getopt(int argc, char *argv[], char *optstring);
+LIBRARY_API std::string cutInput(unsigned int max, int delim, std::string &input);
